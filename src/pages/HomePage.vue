@@ -1,14 +1,25 @@
 <template>
   <container-default>
-    <p>
-      Lorem Ipsum é simplesmente uma simulação de texto da indústria tipográfica e de impressos, e
-      vem sendo utilizado desde o século XVI, quando um impressor desconhecido pegou uma bandeja de
-      tipos e os embaralhou para fazer um livro de modelos de tipos. Lorem Ipsum sobreviveu não só a
-      cinco séculos, como também ao salto para a editoração eletrônica, permanecendo essencialmente
-      inalterado. Se popularizou na década de 60, quando a Letraset lançou decalques contendo
-      passagens de Lorem Ipsum, e mais recentemente quando passou a ser integrado a softwares de
-      editoração eletrônica como Aldus PageMaker.
-    </p>
+    <div class="d-flex justify-space-between">
+      <h2>Dashboard</h2>
+    </div>
+    <v-row>
+      <v-col cols="12" sm="4">
+        <CardDashboard
+          card-title="Categorias"
+          :card-value="categoriesTotal"
+          card-icon="mdi-bulletin-board"
+        >
+        </CardDashboard>
+      </v-col>
+      <v-col cols="12" sm="4">
+        <CardDashboard
+          card-title="Produtos"
+          :card-value="productsTotal"
+          card-icon="mdi-package-variant"
+        ></CardDashboard>
+      </v-col>
+    </v-row>
   </container-default>
 </template>
 
@@ -19,4 +30,32 @@ na parte de globals, colocar o código abaixo:
         rules: {
           'vue/multi-word-component-names': 3, // 0 disables the rule
         },*/
+
+import { useCategoryService, useProductService } from '@/services'
+import { onMounted } from 'vue'
+
+const categoryService = useCategoryService()
+const productService = useProductService()
+const categoriesTotal = ref(0)
+const productsTotal = ref(0)
+
+async function getCategoriesTotal() {
+  try {
+    categoriesTotal.value = await categoryService.getTotal()
+  } catch (error) {
+    notification.error('Não foi possível recuperar as categorias', error)
+  }
+}
+
+async function getProductsTotal() {
+  try {
+    productsTotal.value = await productService.getTotal()
+  } catch (error) {
+    notification.error('Não foi possível recuperar os produtos', error)
+  }
+}
+onMounted(() => {
+  getCategoriesTotal()
+  getProductsTotal()
+})
 </script>
